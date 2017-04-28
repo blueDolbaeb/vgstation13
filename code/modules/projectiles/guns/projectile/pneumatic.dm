@@ -1,29 +1,29 @@
-#define PNEUMATIC_SPEED_CAP 40
-#define PNEUMATIC_SPEED_DIVISOR 400
+#define PNEUMATICP_SPEED_CAP 20
+#define PNEUMATICP_SPEED_DIVISOR 200
 
-/obj/item/weapon/storage/pneumatic
-	name = "pneumatic cannon"
+/obj/item/weapon/storage/pneumaticP
+	name = "pneumatic Pistol"
 	desc = "A launcher powered by compressed air."
 	icon = 'icons/obj/gun.dmi'
-	icon_state = "pneumatic"
-	item_state = "pneumatic"
-	w_class = W_CLASS_LARGE
+	icon_state = "pneumaticP"
+	item_state = "pneumaticP"
+	w_class = W_CLASS_MEDIUM
 	flags = FPRINT
 	siemens_coefficient = 1
 	slot_flags = SLOT_BELT
-	fits_max_w_class = W_CLASS_MEDIUM
-	max_combined_w_class = 20
-	origin_tech = Tc_MATERIALS + "=3;" + Tc_ENGINEERING + "=3"
+	fits_max_w_class = W_CLASS_SMALL
+	max_combined_w_class = 2
+	origin_tech = Tc_MATERIALS + "=1;" + Tc_ENGINEERING + "=2"
 
 	var/obj/item/weapon/tank/tank = null                // Tank of gas for use in firing the cannon.
 	var/obj/item/weapon/storage/tank_container = new()  // Something to hold the tank item so we don't accidentally fire it.
-	var/pressure_setting = 10                           // Percentage of the gas in the tank used to fire the projectile.
-	var/possible_pressure_amounts = list(5,10,20,25,50) // Possible pressure settings.
-	var/minimum_tank_pressure = 10                      // Minimum pressure to fire the gun.
+	var/pressure_setting = 5                           // Percentage of the gas in the tank used to fire the projectile.
+	var/possible_pressure_amounts = list(5,10,15) // Possible pressure settings.
+	var/minimum_tank_pressure = 5                      // Minimum pressure to fire the gun.
 	var/cooldown = 0                                    // Whether or not we're cooling down.
-	var/cooldown_time = 30                              // Time between shots.
+	var/cooldown_time = 15                              // Time between shots.
 
-/obj/item/weapon/storage/pneumatic/verb/set_pressure() //set amount of tank pressure.
+/obj/item/weapon/storage/pneumaticP/verb/set_pressure() //set amount of tank pressure.
 
 
 	set name = "Set valve pressure"
@@ -34,7 +34,7 @@
 		pressure_setting = N
 		to_chat(usr, "You dial the pressure valve to [pressure_setting]%.")
 
-/obj/item/weapon/storage/pneumatic/verb/eject_tank() //Remove the tank.
+/obj/item/weapon/storage/pneumaticP/verb/eject_tank() //Remove the tank.
 
 
 	set name = "Eject tank"
@@ -45,13 +45,13 @@
 		to_chat(usr, "You twist the valve and pop the tank out of [src].")
 		tank.forceMove(usr.loc)
 		tank = null
-		icon_state = "pneumatic"
-		item_state = "pneumatic"
+		icon_state = "pneumaticP"
+		item_state = "pneumaticP"
 		usr.update_icons()
 	else
 		to_chat(usr, "There's no tank in [src].")
 
-/obj/item/weapon/storage/pneumatic/attackby(obj/item/W as obj, mob/user as mob)
+/obj/item/weapon/storage/pneumaticP/attackby(obj/item/W as obj, mob/user as mob)
 	if(!tank && istype(W,/obj/item/weapon/tank))
 		if(!user.drop_item(W, src.tank_container))
 			to_chat(user, "<span class='warning'>You can't let go of \the [W]!</span>")
@@ -59,13 +59,13 @@
 
 		tank = W
 		user.visible_message("[user] jams [W] into [src]'s valve and twists it closed.","You jam [W] into [src]'s valve and twist it closed.")
-		icon_state = "pneumatic-tank"
-		item_state = "pneumatic-tank"
+		icon_state = "pneumaticP-tank"
+		item_state = "pneumaticP-tank"
 		user.update_icons()
 	else
 		. = ..()
 
-/obj/item/weapon/storage/pneumatic/examine(mob/user)
+/obj/item/weapon/storage/pneumaticP/examine(mob/user)
 	..()
 	to_chat(user, "<span class='info'>The valve is dialed to [pressure_setting]%.</span>")
 	if(tank)
@@ -73,7 +73,7 @@
 	else
 		to_chat(user, "<span class='warning'>Nothing is attached to the tank valve!</span>")
 
-/obj/item/weapon/storage/pneumatic/afterattack(atom/target as mob|obj|turf|area, mob/living/user as mob|obj, flag, params)
+/obj/item/weapon/storage/pneumaticP/afterattack(atom/target as mob|obj|turf|area, mob/living/user as mob|obj, flag, params)
 	if (istype(target, /obj/item/weapon/storage/backpack ))
 		return
 
@@ -92,7 +92,7 @@
 	else
 		spawn(0) Fire(target,user,params)
 
-/obj/item/weapon/storage/pneumatic/attack(mob/living/M as mob, mob/living/user as mob, def_zone)
+/obj/item/weapon/storage/pneumaticP/attack(mob/living/M as mob, mob/living/user as mob, def_zone)
 	if (length(contents) > 0)
 		if(user.a_intent == I_HURT)
 			user.visible_message("<span class='danger'>\The [user] fires \the [src] point blank at [M]!</span>")
@@ -102,7 +102,7 @@
 			Fire(M,user)
 			return
 
-/obj/item/weapon/storage/pneumatic/proc/Fire(atom/target as mob|obj|turf|area, mob/living/user as mob|obj, params, reflex = 0)
+/obj/item/weapon/storage/pneumaticP/proc/Fire(atom/target as mob|obj|turf|area, mob/living/user as mob|obj, params, reflex = 0)
 
 
 	if (!tank)
